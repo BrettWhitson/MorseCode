@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_main">
 
     <EditText
-        android:id="@+id/EditText"
+        android:id="@+id/inputText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="7dp"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/mTextView"
         android:layout_width="0dp"
         android:layout_height="363dp"
         android:layout_marginBottom="8dp"
@@ -50,8 +50,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:text="TEST"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintBottom_toTopOf="@+id/mTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/EditText" />
+        app:layout_constraintTop_toBottomOf="@+id/inputText" />
 
 </android.support.constraint.ConstraintLayout>
