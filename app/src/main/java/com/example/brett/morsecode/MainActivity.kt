@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +27,10 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
+
+            val jsonObj = loadMorseJSON()
+
+
         }
 
         testButton.setOnClickListener{ view->
@@ -54,6 +59,27 @@ class MainActivity : AppCompatActivity() {
     fun Context.hideKeyboard(view: View){
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken,0)
+    }
+
+    fun loadMorseJSON() : JSONObject {
+        val filePath = "morse.json"
+
+        val jsonStr = application.assets.open(filePath).bufferedReader().use{
+            it.readText()
+        }
+
+        val jsonObj = JSONObject(jsonStr.substring(jsonStr.indexOf("{"), jsonStr.lastIndexOf("}") + 1))
+
+        return jsonObj
+    }
+
+    var letToCodeDict: HashMap<String, String> = HashMap()
+    var CodeToLetDict: HashMap<String, String> = HashMap()
+
+    fun buildDictsWithJSON(jsonObj : JSONObject){
+        for(k in jsonObj.keys()){
+            
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
