@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -27,10 +28,14 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
+            // had it here
+        }
 
-            val jsonObj = loadMorseJSON()
+        buildDictsWithJSON(loadMorseJSON())
 
-
+        showButton.setOnClickListener{ view ->
+            showCodes()
+            hideKeyboard()
         }
 
         testButton.setOnClickListener{ view->
@@ -74,12 +79,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     var letToCodeDict: HashMap<String, String> = HashMap()
-    var CodeToLetDict: HashMap<String, String> = HashMap()
+    var codeToLetDict: HashMap<String, String> = HashMap()
 
     fun buildDictsWithJSON(jsonObj : JSONObject){
+
         for(k in jsonObj.keys()){
-            
+            val code = jsonObj[k]
+
+            letToCodeDict.put(k, code.toString())
+            codeToLetDict.put(code.toString(), k)
+
         }
+    }
+
+    fun showCodes(){
+        appendTextAndScroll("HERE ARE THE CODES\n")
+        for(k in letToCodeDict.keys.sorted())
+            appendTextAndScroll("$k: ${letToCodeDict[k]}")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
