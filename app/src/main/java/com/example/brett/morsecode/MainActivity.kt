@@ -40,7 +40,10 @@ class MainActivity : AppCompatActivity() {
 
 
         translateButton.setOnClickListener{ view ->
-            if(isMorse(inputText.text.toString())){
+            if(inputText.text.toString() == ""){
+                appendTextAndScroll("")
+            }
+            else if(isMorse(inputText.text.toString())){
                 appendTextAndScroll("Input: ${inputText.text.toString()}")
                 appendTextAndScroll("Translation: ${translateMorseToText(inputText.text.toString())}")
                 hideKeyboard()
@@ -50,6 +53,10 @@ class MainActivity : AppCompatActivity() {
                 appendTextAndScroll("Translation: ${translateTextToMorse(inputText.text.toString())}")
                 hideKeyboard()
             }
+        }
+
+        clearButton.setOnClickListener{ view ->
+            mTextView.setText("")
         }
     }
 
@@ -81,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         var i = 0
         while(i < inputString.length){
-            new_string += letToCodeDict[inputString[i].toString()]
+            new_string += letToCodeDict[inputString[i].toLowerCase().toString()]
             new_string += ' '
             i++
         }
