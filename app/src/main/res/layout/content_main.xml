@@ -27,10 +27,10 @@
         android:id="@+id/mTextView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="13dp"
+        android:layout_marginBottom="7dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="9dp"
         android:background="?android:attr/colorForeground"
         android:fontFamily="monospace"
         android:gravity="bottom"
@@ -40,25 +40,26 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testButton" />
-
-    <Button
-        android:id="@+id/testButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="13dp"
-        android:text="TEST"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputText" />
+        app:layout_constraintTop_toBottomOf="@+id/translateButton" />
 
     <Button
         android:id="@+id/showButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="9dp"
+        android:layout_marginEnd="8dp"
         android:text="Show Codes"
-        app:layout_constraintBaseline_toBaselineOf="@+id/testButton"
-        app:layout_constraintStart_toEndOf="@+id/testButton" />
+        app:layout_constraintBottom_toTopOf="@+id/mTextView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/translateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:text="Translate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputText" />
 
 </android.support.constraint.ConstraintLayout>

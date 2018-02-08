@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
             // had it here
         }
-
+        // has to go outside the {}
         buildDictsWithJSON(loadMorseJSON())
 
         showButton.setOnClickListener{ view ->
@@ -38,9 +38,18 @@ class MainActivity : AppCompatActivity() {
             hideKeyboard()
         }
 
-        testButton.setOnClickListener{ view->
-            appendTextAndScroll(inputText.text.toString())
-            hideKeyboard()
+
+        translateButton.setOnClickListener{ view ->
+            if(isMorse(inputText.text.toString())){
+                appendTextAndScroll("Input: ${inputText.text.toString()}")
+                appendTextAndScroll("Translation: ${translateMorseToText(inputText.text.toString())}")
+                hideKeyboard()
+            }
+            else {
+                appendTextAndScroll("Input: ${inputText.text.toString()}")
+                appendTextAndScroll("Translation: ${translateTextToMorse(inputText.text.toString())}")
+                hideKeyboard()
+            }
         }
     }
 
@@ -64,6 +73,67 @@ class MainActivity : AppCompatActivity() {
     fun Context.hideKeyboard(view: View){
         val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken,0)
+    }
+
+    fun translateTextToMorse(inputString: String) : String{
+
+        var new_string = ""
+
+        var i = 0
+        while(i < inputString.length){
+            new_string += letToCodeDict[inputString[i].toString()]
+            new_string += ' '
+            i++
+        }
+
+
+        return new_string
+    }
+
+    fun translateMorseToText(inputString: String) : String{
+
+        var new_string = ""
+        var temp_string = ""
+        var delim = ' '
+
+        var i = 0
+
+        while(i < inputString.length){
+            if(inputString[i] != delim) {
+                temp_string += inputString[i]
+                i++
+            }
+            else if(inputString[i] == delim) {
+                new_string += codeToLetDict[temp_string].toString()
+                temp_string = ""
+                i++
+            }
+        }
+        new_string += codeToLetDict[temp_string].toString()
+
+        return new_string
+    }
+
+    fun isMorse(inputString : String) : Boolean{
+        var check = true
+        var i = 0
+
+        val checkDot = '.'
+        val checkDash = '-'
+        val checkSlash = '/'
+        val checkSpace = ' '
+
+        while(i < inputString.length) {
+            if (inputString[i] == checkDot || inputString[i] == checkDash || inputString[i] == checkSlash || inputString[i] == checkSpace){
+                i++
+                continue
+            }
+            else{
+                check = false
+                break
+            }
+        }
+        return check
     }
 
     fun loadMorseJSON() : JSONObject {
