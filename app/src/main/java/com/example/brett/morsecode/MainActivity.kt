@@ -21,6 +21,8 @@ import java.lang.Math.round
 import java.util.*
 import kotlin.concurrent.timerTask
 
+val SAMPLE_RATE = 44100
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,8 +67,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         play_button.setOnClickListener{ view ->
-            var textInBox = translateTextToMorse(inputText.text.toString())
-
+            play_button.isClickable = false
+            val textInBox = translateTextToMorse(inputText.text.toString())
             playString(textInBox, 0)
         }
     }
@@ -186,11 +188,13 @@ class MainActivity : AppCompatActivity() {
             appendTextAndScroll("$k: ${letToCodeDict[k]}")
     }
 
-    fun playString(s:String, i: Int = 0) : Unit{
-        if (i > s.length - 1)
-            return;
+    fun playString(s:String, i: Int) : Unit{
+        if (i > s.length - 1) {
+            play_button.isClickable = true
+            return
+        }
 
-        var mDelay: Long = 0
+        //var mDelay: Long = 0
         // thenFun = lambda function that will
         // switch back to main thread and play the next char
         var thenFun: () -> Unit = { ->
@@ -200,7 +204,6 @@ class MainActivity : AppCompatActivity() {
         var c = s[i]
         Log.d("log", "Processing pos: " + i + " char: {" + c + "]")
         if(c == '.') {
-            appendTextAndScroll("Got Dot")
             playDot(thenFun)
         }
         else if(c == '-')
@@ -211,28 +214,26 @@ class MainActivity : AppCompatActivity() {
             pause(2*dotLength, thenFun)
     }
 
-    val dotLength:Int = 50
-    val dashLength:Int = dotLength * 3
+    val dotLength = 50
+    val dashLength = dotLength * 3
 
     val dotSoundBuffer:ShortArray = genSineWaveSoundBuffer(550.0, dotLength)
     val dashSoundBuffer:ShortArray = genSineWaveSoundBuffer(550.0, dashLength)
 
-    fun playDash(onDone : () -> Unit = { /* noop */}){
+    fun playDash(onDone: () -> Unit = {}){
         Log.d("DEBUG", "playDash")
-        playSoundBuffer(dashSoundBuffer, { -> pause(dotLength,onDone)})
+        playSoundBuffer(dashSoundBuffer, {pause(dotLength, onDone)})
     }
 
-    fun playDot(onDone : () -> Unit = { /* noop */ }){
+    fun playDot(onDone: () -> Unit = {}){
         Log.d("DEBUG", "playDot")
-        playSoundBuffer(dotSoundBuffer, { -> pause(dotLength, onDone)})
+        playSoundBuffer(dotSoundBuffer, {pause(dotLength, onDone)})
     }
 
-    fun pause(durationMSec: Int, onDone : () -> Unit = { /* noop */ }){
-        Log.d("DEBUG", "pause: " + durationMSec)
-        Timer().schedule(timerTask{onDone()}, durationMSec.toLong())
+    fun pause(durationMSec: Int, onDone : () -> Unit = {}){
+        Log.d("DEBUG", "pause " + durationMSec)
+        Timer().schedule( timerTask{onDone()}, durationMSec.toLong())
     }
-
-    val SAMPLE_RATE = 44100
 
     private fun genSineWaveSoundBuffer(frequency: Double, durationMSec: Int) : ShortArray{
         val duration:Int = round((durationMSec / 1000.0) * SAMPLE_RATE).toInt()
@@ -263,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                 minBufferSize, AudioTrack.MODE_STREAM)
 
         mAudioTrack.setStereoVolume(AudioTrack.getMaxVolume(), AudioTrack.getMaxVolume())
-        mAudioTrack.setNotificationMarkerPosition(nBuffer.size)
+        mAudioTrack.setNotificationMarkerPosition(mBuffer.size)
         mAudioTrack.setPlaybackPositionUpdateListener(object: AudioTrack.OnPlaybackPositionUpdateListener{
             override fun onPeriodicNotification(track: AudioTrack) {
             }
