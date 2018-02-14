@@ -2,10 +2,13 @@ package com.example.brett.morsecode
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Bundle
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
@@ -22,13 +25,19 @@ import java.util.*
 import kotlin.concurrent.timerTask
 
 val SAMPLE_RATE = 44100
+var morsePitch = 0
 
 class MainActivity : AppCompatActivity() {
+
+    var prefs: SharedPreferences? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        prefs = getDefaultSharedPreferences(this.applicationContext)
+
         //..needed for scrolling
         mTextView.movementMethod = ScrollingMovementMethod();
 
@@ -68,8 +77,10 @@ class MainActivity : AppCompatActivity() {
 
         play_button.setOnClickListener{ view ->
             play_button.isClickable = false
+            morsePitch = prefs!!.getString("morse_pitch", "550").toInt()
             val textInBox = translateTextToMorse(inputText.text.toString())
             playString(textInBox, 0)
+            appendTextAndScroll("$morsePitch")
         }
     }
 
@@ -217,8 +228,8 @@ class MainActivity : AppCompatActivity() {
     val dotLength = 50
     val dashLength = dotLength * 3
 
-    val dotSoundBuffer:ShortArray = genSineWaveSoundBuffer(550.0, dotLength)
-    val dashSoundBuffer:ShortArray = genSineWaveSoundBuffer(550.0, dashLength)
+    val dotSoundBuffer:ShortArray = genSineWaveSoundBuffer(morsePitch.toDouble(), dotLength)
+    val dashSoundBuffer:ShortArray = genSineWaveSoundBuffer(morsePitch.toDouble(), dashLength)
 
     fun playDash(onDone: () -> Unit = {}){
         Log.d("DEBUG", "playDash")
@@ -291,7 +302,12 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
