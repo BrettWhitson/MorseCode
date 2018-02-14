@@ -67,11 +67,7 @@ class MainActivity : AppCompatActivity() {
         play_button.setOnClickListener{ view ->
             var textInBox = translateTextToMorse(inputText.text.toString())
 
-            var i:Int = 0
-            while(i != 50){
-                playDot()
-                i++
-            }
+            playString(textInBox, 0)
         }
     }
 
@@ -198,15 +194,15 @@ class MainActivity : AppCompatActivity() {
         // thenFun = lambda function that will
         // switch back to main thread and play the next char
         var thenFun: () -> Unit = { ->
-            this@MainActivity.runOnUiThread(java.lang.Runnable{
-                playString(s, i+1)
-            })
+            this@MainActivity.runOnUiThread(java.lang.Runnable{playString(s, i+1)})
         }
 
         var c = s[i]
         Log.d("log", "Processing pos: " + i + " char: {" + c + "]")
-        if(c == '.')
+        if(c == '.') {
+            appendTextAndScroll("Got Dot")
             playDot(thenFun)
+        }
         else if(c == '-')
             playDash(thenFun)
         else if(c == '/')
@@ -253,8 +249,7 @@ class MainActivity : AppCompatActivity() {
     private fun playSoundBuffer(mBuffer:ShortArray, onDone : () -> Unit = { /* noop */}){
         var minBufferSize = SAMPLE_RATE/10
         if(minBufferSize < mBuffer.size){
-            minBufferSize = minBufferSize + minBufferSize *
-                    (Math.round(mBuffer.size.toFloat()) / minBufferSize.toFloat() ).toInt()
+            minBufferSize = minBufferSize + minBufferSize * (Math.round(mBuffer.size.toFloat()) / minBufferSize.toFloat() ).toInt()
         }
 
         val nBuffer = ShortArray(minBufferSize)
@@ -268,7 +263,7 @@ class MainActivity : AppCompatActivity() {
                 minBufferSize, AudioTrack.MODE_STREAM)
 
         mAudioTrack.setStereoVolume(AudioTrack.getMaxVolume(), AudioTrack.getMaxVolume())
-        mAudioTrack.setNotificationMarkerPosition(mBuffer.size)
+        mAudioTrack.setNotificationMarkerPosition(nBuffer.size)
         mAudioTrack.setPlaybackPositionUpdateListener(object: AudioTrack.OnPlaybackPositionUpdateListener{
             override fun onPeriodicNotification(track: AudioTrack) {
             }
