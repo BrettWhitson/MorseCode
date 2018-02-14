@@ -30,6 +30,13 @@ var morsePitch = 0
 class MainActivity : AppCompatActivity() {
 
     var prefs: SharedPreferences? = null
+    var letToCodeDict: HashMap<String, String> = HashMap()
+    var codeToLetDict: HashMap<String, String> = HashMap()
+    val dotLength = 50
+    val dashLength = dotLength * 3
+
+    var dotSoundBuffer:ShortArray = kotlin.ShortArray(0)
+    var dashSoundBuffer:ShortArray = kotlin.ShortArray(0)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,10 +84,12 @@ class MainActivity : AppCompatActivity() {
 
         play_button.setOnClickListener{ view ->
             play_button.isClickable = false
+
             morsePitch = prefs!!.getString("morse_pitch", "550").toInt()
+            genNewSineBuffer()
+
             val textInBox = translateTextToMorse(inputText.text.toString())
             playString(textInBox, 0)
-            appendTextAndScroll("$morsePitch")
         }
     }
 
@@ -179,9 +188,6 @@ class MainActivity : AppCompatActivity() {
         return jsonObj
     }
 
-    var letToCodeDict: HashMap<String, String> = HashMap()
-    var codeToLetDict: HashMap<String, String> = HashMap()
-
     fun buildDictsWithJSON(jsonObj : JSONObject){
 
         for(k in jsonObj.keys()){
@@ -225,12 +231,6 @@ class MainActivity : AppCompatActivity() {
             pause(2*dotLength, thenFun)
     }
 
-    val dotLength = 50
-    val dashLength = dotLength * 3
-
-    val dotSoundBuffer:ShortArray = genSineWaveSoundBuffer(morsePitch.toDouble(), dotLength)
-    val dashSoundBuffer:ShortArray = genSineWaveSoundBuffer(morsePitch.toDouble(), dashLength)
-
     fun playDash(onDone: () -> Unit = {}){
         Log.d("DEBUG", "playDash")
         playSoundBuffer(dashSoundBuffer, {pause(dotLength, onDone)})
@@ -244,6 +244,11 @@ class MainActivity : AppCompatActivity() {
     fun pause(durationMSec: Int, onDone : () -> Unit = {}){
         Log.d("DEBUG", "pause " + durationMSec)
         Timer().schedule( timerTask{onDone()}, durationMSec.toLong())
+    }
+
+    fun genNewSineBuffer(){
+        dotSoundBuffer = genSineWaveSoundBuffer(morsePitch.toDouble(), dotLength)
+        dashSoundBuffer = genSineWaveSoundBuffer(morsePitch.toDouble(), dashLength)
     }
 
     private fun genSineWaveSoundBuffer(frequency: Double, durationMSec: Int) : ShortArray{
