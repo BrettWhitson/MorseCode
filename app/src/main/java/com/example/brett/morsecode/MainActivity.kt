@@ -1,15 +1,19 @@
 package com.example.brett.morsecode
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Bundle
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
@@ -23,12 +27,13 @@ import org.json.JSONObject
 import java.lang.Math.round
 import java.util.*
 import kotlin.concurrent.timerTask
+import android.telephony.SmsManager
+
 
 val SAMPLE_RATE = 44100
 var morsePitch = 0
 
 class MainActivity : AppCompatActivity() {
-
     var prefs: SharedPreferences? = null
     var letToCodeDict: HashMap<String, String> = HashMap()
     var codeToLetDict: HashMap<String, String> = HashMap()
@@ -42,12 +47,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        setupPermissions()
         prefs = getDefaultSharedPreferences(this.applicationContext)
 
         //..needed for scrolling
         mTextView.movementMethod = ScrollingMovementMethod();
 
-        fab.setOnClickListener { view ->
+        messageButton.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
             // had it here
@@ -96,6 +102,13 @@ class MainActivity : AppCompatActivity() {
                 playString(morseInBox, 0)
             }
         }
+
+        messageButton.setOnClickListener{ view ->
+            val phoneNumber = "17315921309"
+            val message = "This is a test"
+            sendSMS(phoneNumber, message)
+        }
+
     }
 
     private fun appendTextAndScroll(text: String){
@@ -300,6 +313,24 @@ class MainActivity : AppCompatActivity() {
         mAudioTrack.write(nBuffer, 0, minBufferSize)
     }
 
+    private fun sendSMS(phoneNumber: String, message: String) {
+        val sm = SmsManager.getDefault()
+        sm.sendTextMessage(phoneNumber, null, message, null, null)
+    }
+
+    private fun setupPermissions(){
+        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Permissions", "Permission to record denied")
+            makeRequest()
+        }
+    }
+
+    private fun makeRequest() {
+        val REQUEST_CODE = 101
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS), REQUEST_CODE)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -322,3 +353,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
