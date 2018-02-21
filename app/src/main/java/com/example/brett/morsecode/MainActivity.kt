@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     var dotSoundBuffer:ShortArray = kotlin.ShortArray(0)
     var dashSoundBuffer:ShortArray = kotlin.ShortArray(0)
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -85,11 +84,17 @@ class MainActivity : AppCompatActivity() {
         play_button.setOnClickListener{ view ->
             play_button.isClickable = false
 
-            morsePitch = prefs!!.getString("morse_pitch", "550").toInt()
-            genNewSineBuffer()
+                morsePitch = prefs!!.getString("morse_pitch", "550").toInt()
+                genNewSineBuffer()
 
-            val textInBox = translateTextToMorse(inputText.text.toString())
-            playString(textInBox, 0)
+            if(isMorse(inputText.text.toString()) == false) {
+                val textInBox = translateTextToMorse(inputText.text.toString())
+                playString(textInBox, 0)
+            }
+            else if(isMorse(inputText.text.toString())){
+                val morseInBox = inputText.text.toString()
+                playString(morseInBox, 0)
+            }
         }
     }
 
