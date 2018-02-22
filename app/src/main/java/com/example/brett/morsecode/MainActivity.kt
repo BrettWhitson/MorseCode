@@ -2,7 +2,9 @@ package com.example.brett.morsecode
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -17,9 +19,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -28,6 +27,9 @@ import java.lang.Math.round
 import java.util.*
 import kotlin.concurrent.timerTask
 import android.telephony.SmsManager
+import android.view.*
+import android.widget.EditText
+import android.widget.Toast
 
 
 val SAMPLE_RATE = 44100
@@ -104,11 +106,35 @@ class MainActivity : AppCompatActivity() {
         }
 
         messageButton.setOnClickListener{ view ->
-            val phoneNumber = "17315921309"
-            val message = "This is a test"
-            sendSMS(phoneNumber, message)
+            getNumber()
         }
 
+    }
+
+    fun getNumber(){
+        val dialog = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.number_retrieval, null)
+        val et_number = dialogView.findViewById<EditText>(R.id.phone_number_box)
+        dialog.setView(dialogView)
+        dialog.setCancelable(false)
+
+        dialog.setPositiveButton("Ok",{ dialogInterface: DialogInterface, i: Int -> })
+
+        val getText = dialog.create()
+        getText.show()
+
+        getText.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener({
+            val number = et_number.text.toString()
+            val message = translateTextToMorse(inputText.text.toString())
+            if(et_number.length() < 7){
+                Toast.makeText(baseContext,"Not a valid phone number.", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                Toast.makeText(baseContext, "Message sent to $number.", Toast.LENGTH_SHORT).show()
+                getText.dismiss()
+                sendSMS(number, message)
+            }
+        })
     }
 
     private fun appendTextAndScroll(text: String){
